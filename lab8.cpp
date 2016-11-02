@@ -11,6 +11,7 @@ class Message{
 	private:
 		
 	public:
+		int truthVal;
 		int stringSize;
 		string message;
 		Message();
@@ -22,13 +23,15 @@ Message::Message(){
 	cout << "hello user, please enter a message\n" << endl;
 	cin >> message;
 	stringSize = message.length();
-	cout << "Size of the string is "<< stringSize << " bytes\n" << endl;
+	//cout << "Size of the string is "<< stringSize << " bytes\n" << endl;
+	truthVal = 0;
 	
 }
 Message::Message(string message1){
 	message = message1;
 	stringSize = message.length();
-	cout << "Size of the string is "<< stringSize << endl;
+	//cout << "Size of the string is "<< stringSize << endl;
+	truthVal = 0;
 }
 
 class morseMessage : public Message{
@@ -44,6 +47,7 @@ morseMessage::morseMessage(){
 	stringSize = message.length();
 	cout << "size of morse string is " << stringSize << endl;
 	translate(message);
+	truthVal = 1;
 }	
 morseMessage::~morseMessage(){
 	//delete[] morseMessage;
@@ -63,18 +67,18 @@ class stackMessage{
 };
 void stackMessage::printStack(stackMessage msg){
 	int j = 0;
-	cout << "\nSTACK\n" << endl;
+	cout << "\n\t\tSTACK\n" << endl;
 	while(j < i)
 	{
-		cout << "Message: " << stackPtr[j]->message << endl;//this will actually print out the correct info.. but i messed up my constructor and cannot get it working again
+		cout << "Eleement " << j+1 << ":" << endl;
+		stackPtr[j]->print();
 		j++;
 	}
-
+	cout << "\n\n" << endl;
 }
 stackMessage::stackMessage(){
 	i = 0;
 	startPtr = NULL;
-	//stackPtr[10] = new Message[10];//this gives a compile error... not sure how to correctly allocate memory
 }
 void stackMessage::pushMsg(Message message){//two different pushMsg methods, depends on if it is a regular message or a morse message
 	if(startPtr == NULL);
@@ -83,8 +87,7 @@ void stackMessage::pushMsg(Message message){//two different pushMsg methods, dep
 	}
 	if(numStackElements >= 10) return;
 	else{
-		*stackPtr[i] = message;
-		//*stackPtr; // this gives a compile error
+		stackPtr[i] = new Message(message);
 		i++;
 	}
 }
@@ -95,21 +98,28 @@ void stackMessage::pushMsg(morseMessage message){
 	}
 	if(numStackElements >= 10) return;
 	else{
-		*stackPtr[i] = message;
-		//stackPtr++; //this gives a compile error...
+		stackPtr[i] = new morseMessage(message);
 		i++;
 	}
 }
+void stackMessage::popMsg(){
+	if(i == 0){
+		cout << "Theres nothing to pop!" << endl;
+		return;
+	}
+	delete stackPtr[i-1];
+	i--;
+}
 void Message::print(void)
 {
-	cout << "Message: " << message << endl;
+	cout << "\tMessage: " << message << endl;
 }
 void morseMessage::print()
 {
 	int i =0;
 	string* startPtr = morseMsg;
-	cout << "Message:\n" << message << endl;
-	cout << "Morse Message:" << endl;
+	cout << "\tMessage:" << message << endl;
+	cout << "\tMorse Message:" << endl;
 	while (i < stringSize){
 		cout  << *morseMsg << "\t";
 		morseMsg++;
@@ -159,7 +169,7 @@ int main(void)
 				}
 				break;
 			case 2:
-				cout << "need to pop" << endl;//havent implemented the pop yet
+				msg4.popMsg();
 				break;
 			case 3: 
 				msg4.printStack(msg4);//print stack used to work in a way, however i could only get the first element of the stack into memory
@@ -182,7 +192,6 @@ void morseMessage::translate(string message1)
 	string morseLetters[26] =  {
 	".-","-...","-.-.","-..",".","..-.","--.","....","..",".---","-.-",".-..","--","-.","---",
 	".--.","--.-",".-.","...","-","..-","...-",".--","-..-","-.--","--.."};	
-	//cout <<"test\n"<< endl;
 	for(i=0;i<stringSize;i++)
 	{
 		c = message[i];
